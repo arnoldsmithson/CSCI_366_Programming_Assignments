@@ -22,6 +22,13 @@ Client::~Client() {
 
 
 void Client::initialize(unsigned int player, unsigned int board_size){
+    if(player > 2){
+        throw ClientWrongPlayerNumberException();
+    }
+    else{
+        this->player = player;
+
+    }
 }
 
 
