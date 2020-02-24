@@ -18,6 +18,7 @@
 #include "Client.hpp"
 #include <cereal/archives/json.hpp>
 #include <fstream>
+
 using namespace std;
 
 
@@ -25,30 +26,45 @@ Client::~Client() {
 }
 
 
-void Client::initialize(unsigned int player, unsigned int board_size){
-    if(player > 2){
+void Client::initialize(unsigned int player, unsigned int board_size) {
+    if (player > 2) {
         throw ClientWrongPlayerNumberException();
-    }
-    else{
+    } else {
         this->player = player;
         this->board_size = board_size;
         string name = "player_";
         name += std::to_string(player);
         name += ".action_board.json";
         //Creates player_#.action_board.json.
-        vector<int> v(board_size,0);
-        vector<vector<int>> vect(board_size,v);
+        vector<int> v(board_size, 0);
+        vector<vector<int>> vect(board_size, v);
         ofstream file;
         file.open(name, ofstream::out);
-        cereal::JSONOutputArchive arc(file);
-        arc(CEREAL_NVP(vect));
-        file.close();
-        initialized = true;
+        if (file) {
+            cereal::JSONOutputArchive arc(file);
+            arc(CEREAL_NVP(vect));
+            file.close();
+            initialized = true;
+        } else {
+            cout << "File not found." << endl;
+        }
+
     }
 }
 
 
 void Client::fire(unsigned int x, unsigned int y) {
+    vector<int> v(2, 0);
+    v[0] = x;
+    v[1] = y;
+    string name = "player_";
+    name += std::to_string(player);
+    name += ".shot.json";
+    ofstream file;
+    file.open(name, ofstream::out);
+    cereal::JSONOutputArchive arc(file);
+    arc(CEREAL_NVP(v));
+    file.flush();
 }
 
 
@@ -60,12 +76,11 @@ int Client::get_result() {
 }
 
 
-
 void Client::update_action_board(int result, unsigned int x, unsigned int y) {
 }
 
 
-string Client::render_action_board(){
+string Client::render_action_board() {
 }
 
 
