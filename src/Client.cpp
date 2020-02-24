@@ -16,6 +16,10 @@
 
 #include "common.hpp"
 #include "Client.hpp"
+#include <cereal/archives/json.hpp>
+#include <fstream>
+using namespace std;
+
 
 Client::~Client() {
 }
@@ -27,7 +31,19 @@ void Client::initialize(unsigned int player, unsigned int board_size){
     }
     else{
         this->player = player;
-
+        this->board_size = board_size;
+        string name = "player_";
+        name += std::to_string(player);
+        name += ".action_board.json";
+        //Creates player_#.action_board.json.
+        vector<int> v(board_size,0);
+        vector<vector<int>> vect(board_size,v);
+        ofstream file;
+        file.open(name, ofstream::out);
+        cereal::JSONOutputArchive arc(file);
+        arc(CEREAL_NVP(vect));
+        file.close();
+        initialized = true;
     }
 }
 
@@ -51,3 +67,5 @@ void Client::update_action_board(int result, unsigned int x, unsigned int y) {
 
 string Client::render_action_board(){
 }
+
+
