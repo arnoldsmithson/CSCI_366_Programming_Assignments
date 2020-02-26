@@ -40,7 +40,6 @@ void Client::initialize(unsigned int player, unsigned int board_size) {
         vector<vector<int>> board(board_size, v);
         ofstream file;
         file.open(name, ofstream::out);
-        board.end();
         if (file) {
             {
                 cereal::JSONOutputArchive arc(file);
@@ -58,19 +57,16 @@ void Client::initialize(unsigned int player, unsigned int board_size) {
 
 void Client::fire(unsigned int x, unsigned int y) {
     string name = "player_";
-    vector<int> coords(board_size, 0);
-    coords[0] = x;
-    coords[1] = y;
     name += to_string(player);
     name += ".shot.json";
+
     ofstream file;
     {
         file.open(name, ofstream::out);
         cereal::JSONOutputArchive arc(file);
-        arc(CEREAL_NVP(coords));
+        arc(CEREAL_NVP(x),CEREAL_NVP(y));
     }
     file.flush();
-    //TODO:Call process_shot with player_name
 }
 
 bool Client::result_available() {
@@ -82,11 +78,53 @@ int Client::get_result() {
 
 
 void Client::update_action_board(int result, unsigned int x, unsigned int y) {
+    vector<int> v(2,0);
+    vector<vector<int>> board(board_size,v);
+
+    string filename = "player_"+to_string(player)+".action_board.json";
+    ifstream fin;
+    fin.open(filename);
+    if(fin.good()){
+        {
+            cereal::JSONInputArchive arc(fin);
+            arc(board);
+        }
+    }
+    board[x][y] = result;
+    ofstream fout;
+    fout.open(filename);
+    if(fout.good()){
+        {
+            cereal::JSONOutputArchive arcin(fout);
+            arcin(CEREAL_NVP(board));
+        }
+    }
+
 
 }
 
 
 string Client::render_action_board() {
+    vector<int> v(2,0);
+    vector<vector<int>> board(board_size,v);
+
+    string filename = "player_"+to_string(player)+".action_board.json";
+    ifstream fin;
+    fin.open(filename);
+    if(fin.good()){
+        {
+            cereal::JSONInputArchive arc(fin);
+            arc(board);
+        }
+    }
+    string end = "";
+    for (int i = 0; i < board_size; ++i) {
+        for (int j = 0; j < board_size; ++j) {
+            end += board[i][j];
+        }
+        end += "\n";
+    }
+    return end;
 }
 
 
