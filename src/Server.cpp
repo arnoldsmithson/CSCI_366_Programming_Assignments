@@ -38,8 +38,43 @@ void Server::initialize(unsigned int board_size,
     } else if (p1_setup_board.length() < 1 || p2_setup_board.length() < 1) {
         throw ServerException("Bad File Names.");
     } else {
+        string line;
+        vector<string> lines(board_size,"");
         this->p1_setup_board.open(p1_setup_board);
         this->p2_setup_board.open(p2_setup_board);
+        int i = 0;
+            while ( getline (this->p1_setup_board,line) )
+            {
+                lines[i] = line;
+                i++;
+            }
+        this->p1_setup_board.close();
+        ofstream fout;
+        fout.open(p1_setup_board);
+        for (int j = 0; j < lines.size(); ++j) {
+            string fileLine;
+            switch(lines[j].at(lines[j].length()-1)){
+                case 'D':
+                    fileLine += "DD";
+                    for (int k = 0; k < board_size-2; ++k) {
+                        fileLine += " ";
+                    }
+                    break;
+                case 'C':
+                    break;
+                case 'R':
+                    break;
+                case 'S':
+                    break;
+                case 'B':
+                    break;
+            }
+        }
+        while ( getline (this->p2_setup_board,line) )
+        {
+            cout << line << '\n';
+        }
+        this->p2_setup_board.close();
 
         cout << "Working parameters" << endl;
     }
@@ -48,9 +83,9 @@ void Server::initialize(unsigned int board_size,
 
 
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
-    if (x > board_size) {
+    if (x > board_size-1) {
         return OUT_OF_BOUNDS;
-    } else if (y > board_size) {
+    } else if (y > board_size-1) {
         return OUT_OF_BOUNDS;
     } else if (player < 1 || player > MAX_PLAYERS) {
         throw ServerException("Bad Player Number.");
