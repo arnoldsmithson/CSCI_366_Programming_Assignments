@@ -17,6 +17,8 @@
 
 #include "common.hpp"
 #include "Server.hpp"
+#include <cereal/archives/json.hpp>
+#include <cereal/access.hpp>
 
 
 /**
@@ -27,18 +29,90 @@
  */
 int get_file_length(ifstream *file){
 }
-
+class Coord{
+public:
+    Coord(int x, int y){
+        this->x = x;
+        this->y = y;
+    }
+    Coord(){
+        this->x = -100;
+        this->y = -100;
+    }
+    template<class Archive>
+    void serialize(Archive & archive)
+    {
+        archive(x,y);
+    }
+public:
+    int x,y;
+};
 
 void Server::initialize(unsigned int board_size,
                         string p1_setup_board,
                         string p2_setup_board){
+    if(board_size < 2) {
+        throw ServerException("Wrong Board Size");
+    }else if(p1_setup_board.length() < 1 || p2_setup_board.length() < 1){
+        throw ServerException("Bad File Names.");
+    }else{
+        this->p1_setup_board.open(p1_setup_board);
+        this->p2_setup_board.open(p2_setup_board);
+
+        cout << "Working parameters" <<endl;
+    }
+
 }
 
 
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
+    if(x > board_size){
+        return OUT_OF_BOUNDS;
+    }
+    else if(y > board_size){
+        return OUT_OF_BOUNDS;
+    }
+    else if(player < 1 || player > MAX_PLAYERS) {
+        throw ServerException("Bad Player Number.");
+    }else{
+        if(player == 1){
+            cout << "Working with Player 1" <<endl;
+        }else{
+            cout << "Working with Player 2" << endl;
+        }
+
+        //TODO:Work with Files: Grab board, see if miss or hit, return result as json file
+        if(player == 1){
+            cout << "Finished with P1 File" <<endl;
+        }else{
+            cout << "Finished with P2 File" <<endl;
+        }
+    }
+
 }
 
 
 int Server::process_shot(unsigned int player) {
+    string name = "player_";
+    name += to_string(player);
+    name += ".shot.json";
+    vector<int> coord(2,0);
+    Coord c;
+    std::ifstream f;
+    f.open(name);
+    {
+        if(f.good()){
+            cereal::JSONInputArchive fin(f);
+            fin(c);
+            cout <<c.x<<endl;
+            cout << c.y<< endl;
+        }
+        else{
+            cout <<"File not found"<< endl;
+        }
+
+    }
+
+    //TODO:Grab proper file, if no file then this statement, else call eval shot
    return NO_SHOT_FILE;
 }

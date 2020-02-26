@@ -113,7 +113,7 @@ protected:
     Server srv;
 
     void set_up_shot(unsigned int x, unsigned int y){
-        string coords = "{\"x\": "+to_string(x)+",\"y\": "+to_string(y)+"}";
+        string coords = "{\`"x\": "+to_string(x)+",\"y\": "+to_string(y)+"}";
         ofstream shot_file("player_1.shot.json");
         shot_file << coords;
         shot_file.close();
