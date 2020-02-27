@@ -33,16 +33,17 @@ int get_file_length(ifstream *file) {
 void Server::initialize(unsigned int board_size,
                         string p1_setup_board,
                         string p2_setup_board) {
-    if (board_size < 2) {
+    if (board_size != BOARD_SIZE) {
         throw ServerException("Wrong Board Size");
     } else if (p1_setup_board.length() < 1 || p2_setup_board.length() < 1) {
         throw ServerException("Bad File Names.");
     } else {
+        this->board_size = board_size;
         string line;
-        vector<string> lines(board_size,"");
+        vector<string> lines(board_size, "");
         this->p1_setup_board.open(p1_setup_board);
         this->p2_setup_board.open(p2_setup_board);
-        int i = 0;
+/*        int i = 0;
             while ( getline (this->p1_setup_board,line) )
             {
                 lines[i] = line;
@@ -74,7 +75,7 @@ void Server::initialize(unsigned int board_size,
         {
             cout << line << '\n';
         }
-        this->p2_setup_board.close();
+        this->p2_setup_board.close();*/
 
         cout << "Working parameters" << endl;
     }
@@ -83,45 +84,70 @@ void Server::initialize(unsigned int board_size,
 
 
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
-    if (x > board_size-1) {
+    if (x > board_size || x < 0) {
         return OUT_OF_BOUNDS;
-    } else if (y > board_size-1) {
+    } else if (y > board_size || y < 0) {
         return OUT_OF_BOUNDS;
     } else if (player < 1 || player > MAX_PLAYERS) {
         throw ServerException("Bad Player Number.");
     } else {
-        string name = "player_"+to_string(player)+".setup_board.txt";
+        string name = "player_" + to_string(player) + ".setup_board.txt";
         ifstream fin;
         fin.open(name);
+        string line;
+        vector<string> lines(board_size, "");
+        int i = 0;
+        while (getline(fin, line)) {
+            lines[i] = line;
+            i++;
+        }
+        fin.close();
+        char spot = lines[x].at(y);
+        cout <<spot << "In board" << endl;
+        if (spot == 'B' || spot == 'D' || spot == 'R' || spot == 'S' || spot == 'C') {
+            return HIT;
+        } else {
+            return MISS;
+        }
 
     }
 }
 
 
 int Server::process_shot(unsigned int player) {
-    string name = "player_";
-    name += to_string(player);
-    name += ".shot.json";
+    if (player > 0 && player <= 2) {
+        string name = "player_";
+        name += to_string(player);
+        name += ".shot.json";
 
-    int x,y, result;
-    std::ifstream f;
-    f.open(name);
-    if(!f.good()){
-        return NO_SHOT_FILE;
-    }
-    else{
-        {
-            cereal::JSONInputArchive fin(f);
-            fin(x,y);
-            result = evaluate_shot(player,x,y);
+        int x=0, y=0, result=0;
+        std::ifstream f;
+        f.open(name);
+        if (!f.good()) {
+            return NO_SHOT_FILE;
+        } else {
+            {
+                cereal::JSONInputArchive fin(f);
+                fin(x, y);
+                if ((x < board_size && x >= 0) && (y < board_size && y >= 0)) {
+                    result = evaluate_shot(player, x, y);
+                } else {
+                    result = OUT_OF_BOUNDS;
+                }
+
+            }
+            string filename = "player_" + to_string(player) + ".result.json";
+            ofstream fout;
+            fout.open(filename);
+            {
+                cereal::JSONOutputArchive archive(fout);
+                archive(CEREAL_NVP(result));
+            }
+            remove(name.c_str());
+            return SHOT_FILE_PROCESSED;
         }
-        string filename = "player_"+to_string(player)+".result.json";
-        ofstream fout;
-        fout.open(filename);
-        {
-            cereal::JSONOutputArchive archive(fout);
-            archive(CEREAL_NVP(result));
-        }
-        return SHOT_FILE_PROCESSED;
+    } else {
+        throw ServerException("Bad Player Number.");
     }
+
 }

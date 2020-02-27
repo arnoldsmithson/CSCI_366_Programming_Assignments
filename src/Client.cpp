@@ -70,10 +70,36 @@ void Client::fire(unsigned int x, unsigned int y) {
 }
 
 bool Client::result_available() {
+    string fileName = "player_"+to_string(player)+".result.json";
+    ifstream fin;
+    fin.open(fileName);
+    if(fin){
+        return true;
+    }
+    else{
+        return false;
+    }
 }
 
 
 int Client::get_result() {
+    if(result_available()){
+        int result = 0;
+        string fileName = "player_"+to_string(player)+".result.json";
+        ifstream fin;
+        fin.open(fileName);
+        cereal::JSONInputArchive arcin(fin);
+        arcin(result);
+        cout <<result<<endl;
+        fin.close();
+        remove(fileName.c_str());
+        if(result >= -1 && result <= 1) {
+            return result;
+        }else{
+            throw ClientException("Bad Result Num.");
+        }
+
+    }
 }
 
 
@@ -117,10 +143,10 @@ string Client::render_action_board() {
             arc(board);
         }
     }
-    string end = "";
+    string end;
     for (int i = 0; i < board_size; ++i) {
         for (int j = 0; j < board_size; ++j) {
-            end += board[i][j];
+            end += to_string(board[i][j]);
         }
         end += "\n";
     }
