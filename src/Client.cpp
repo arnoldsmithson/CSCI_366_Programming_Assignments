@@ -59,7 +59,6 @@ void Client::fire(unsigned int x, unsigned int y) {
     string name = "player_";
     name += to_string(player);
     name += ".shot.json";
-
     ofstream file;
     {
         file.open(name, ofstream::out);

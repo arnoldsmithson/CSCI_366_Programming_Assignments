@@ -123,14 +123,20 @@ int Server::process_shot(unsigned int player) {
         int x=0, y=0, result=0;
         std::ifstream f;
         f.open(name);
-        if (!f.good()) {
+        if (!f) {
             return NO_SHOT_FILE;
         } else {
             {
                 cereal::JSONInputArchive fin(f);
                 fin(x, y);
                 if ((x < board_size && x >= 0) && (y < board_size && y >= 0)) {
-                    result = evaluate_shot(player, x, y);
+                    if(player == 1){
+                        result = evaluate_shot(player+1, x, y);
+                    }
+                    else{
+                        result = evaluate_shot(player-1, x, y);
+                    }
+
                 } else {
                     result = OUT_OF_BOUNDS;
                 }
