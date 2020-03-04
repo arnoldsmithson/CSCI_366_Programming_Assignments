@@ -38,6 +38,8 @@ void Client::initialize(unsigned int player, unsigned int board_size) {
         //Creates player_#.action_board.json.
         vector<int> v(board_size, 0);
         vector<vector<int>> board(board_size, v);
+        // [[0,0]
+        //  [0,0]]
         ofstream file;
         file.open(name, ofstream::out);
         if (file) {
