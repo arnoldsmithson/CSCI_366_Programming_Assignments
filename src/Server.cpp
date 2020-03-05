@@ -39,47 +39,8 @@ void Server::initialize(unsigned int board_size,
         throw ServerException("Bad File Names.");
     } else {
         this->board_size = board_size;
-        string line;
-        vector<string> lines(board_size, "");
-        this->p1_setup_board.open(p1_setup_board);
-        this->p2_setup_board.open(p2_setup_board);
-/*        int i = 0;
-            while ( getline (this->p1_setup_board,line) )
-            {
-                lines[i] = line;
-                i++;
-            }
-        this->p1_setup_board.close();
-        ofstream fout;
-        fout.open(p1_setup_board);
-        for (int j = 0; j < lines.size(); ++j) {
-            string fileLine;
-            switch(lines[j].at(lines[j].length()-1)){
-                case 'D':
-                    fileLine += "DD";
-                    for (int k = 0; k < board_size-2; ++k) {
-                        fileLine += " ";
-                    }
-                    break;
-                case 'C':
-                    break;
-                case 'R':
-                    break;
-                case 'S':
-                    break;
-                case 'B':
-                    break;
-            }
-        }
-        while ( getline (this->p2_setup_board,line) )
-        {
-            cout << line << '\n';
-        }
-        this->p2_setup_board.close();*/
-
         cout << "Working parameters" << endl;
     }
-
 }
 
 
@@ -99,11 +60,12 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
         int i = 0;
         while (getline(fin, line)) {
             lines[i] = line;
+            cout << lines[i] << endl;
             i++;
         }
         fin.close();
         char spot = lines[x].at(y);
-        cout <<spot << "In board" << endl;
+        cout <<spot << " In board at " << x << ","<<y<<endl;
         if (spot == 'B' || spot == 'D' || spot == 'R' || spot == 'S' || spot == 'C') {
             return HIT;
         } else {
@@ -128,7 +90,7 @@ int Server::process_shot(unsigned int player) {
         } else {
             {
                 cereal::JSONInputArchive fin(f);
-                fin(x, y);
+                fin(y,x);
                 if ((x < board_size && x >= 0) && (y < board_size && y >= 0)) {
                     if(player == 1){
                         result = evaluate_shot(player+1, x, y);
@@ -138,6 +100,7 @@ int Server::process_shot(unsigned int player) {
                     }
 
                 } else {
+                    cout << "OUT OF BOUNDS detected in process_shot" << endl;
                     result = OUT_OF_BOUNDS;
                 }
 

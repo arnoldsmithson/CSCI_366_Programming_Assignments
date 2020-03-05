@@ -36,8 +36,8 @@ void Client::initialize(unsigned int player, unsigned int board_size) {
         name += std::to_string(player);
         name += ".action_board.json";
         //Creates player_#.action_board.json.
-        vector<int> v(board_size, 0);
-        vector<vector<int>> board(board_size, v);
+        vector<int> v(this->board_size, 0);
+        vector<vector<int>> board(this->board_size, v);
         // [[0,0]
         //  [0,0]]
         ofstream file;
@@ -105,7 +105,7 @@ int Client::get_result() {
 
 
 void Client::update_action_board(int result, unsigned int x, unsigned int y) {
-    vector<int> v(2,0);
+    vector<int> v(board_size,0);
     vector<vector<int>> board(board_size,v);
 
     string filename = "player_"+to_string(player)+".action_board.json";
@@ -132,7 +132,7 @@ void Client::update_action_board(int result, unsigned int x, unsigned int y) {
 
 
 string Client::render_action_board() {
-    vector<int> v(2,0);
+    vector<int> v(board_size,0);
     vector<vector<int>> board(board_size,v);
 
     string filename = "player_"+to_string(player)+".action_board.json";
