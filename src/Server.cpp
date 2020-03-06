@@ -52,6 +52,12 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
     } else if (player < 1 || player > MAX_PLAYERS) {
         throw ServerException("Bad Player Number.");
     } else {
+        if(player == 1){
+            player = 2;
+        }
+        else{
+            player = 1;
+        }
         string name = "player_" + to_string(player) + ".setup_board.txt";
         ifstream fin;
         fin.open(name);
@@ -92,12 +98,13 @@ int Server::process_shot(unsigned int player) {
                 cereal::JSONInputArchive fin(f);
                 fin(y,x);
                 if ((x < board_size && x >= 0) && (y < board_size && y >= 0)) {
-                    if(player == 1){
+                    result = evaluate_shot(player,x,y);
+                    /*if(player == 1){
                         result = evaluate_shot(player+1, x, y);
                     }
                     else{
                         result = evaluate_shot(player-1, x, y);
-                    }
+                    }*/
 
                 } else {
                     cout << "OUT OF BOUNDS detected in process_shot" << endl;
