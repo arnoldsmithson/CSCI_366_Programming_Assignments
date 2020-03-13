@@ -41,7 +41,7 @@ void Client::initialize(unsigned int player, unsigned int board_size) {
         // [[0,0]
         //  [0,0]]
         ofstream file;
-        file.open(name, ofstream::out);
+        file.open(name);
         if (file) {
             {
                 cereal::JSONOutputArchive arc(file);
@@ -49,8 +49,6 @@ void Client::initialize(unsigned int player, unsigned int board_size) {
             }
             file.close();
             initialized = true;
-        } else {
-            cout << "File not found." << endl;
         }
 
     }

@@ -37,6 +37,8 @@ void Server::initialize(unsigned int board_size,
         throw ServerException("Wrong Board Size");
     } else if (p1_setup_board.length() < 1 || p2_setup_board.length() < 1) {
         throw ServerException("Bad File Names.");
+    }else if(p1_setup_board == p2_setup_board){
+        throw ServerException("Same Player File.");
     } else {
         this->board_size = board_size;
         cout << "Working parameters" << endl;

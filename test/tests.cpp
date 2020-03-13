@@ -73,7 +73,6 @@ TEST_F(ServerInitialize, Bad_File_Name){
     ASSERT_ANY_THROW(srv.initialize(BOARD_SIZE, "", ""));
 }
 
-
 class ServerEvaluateShot : public ::testing::Test{
 protected:
     Server srv;
