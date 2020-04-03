@@ -42,6 +42,8 @@ void Server::initialize(unsigned int board_size,
     } else {
         this->board_size = board_size;
         cout << "Working parameters" << endl;
+        //Create the 2DBitArrays based on setup board using scan_setup_board
+        // So, read in .txt and create the array in assembly.
     }
 }
 
@@ -50,7 +52,27 @@ Server::~Server() {
 }
 
 
-BitArray2D *Server::scan_setup_board(string setup_board_name){
+BitArray2D *Server::scan_setup_board(string setup_board_name){//return BitArray2D to initialize arrays
+    //Section to read in file for initialization
+    ifstream fin;
+    fin.open(setup_board_name);
+    string line;
+    vector<string> lines(board_size, "");
+    int i = 0;
+    while (getline(fin, line)) {
+        lines[i] = line;
+        cout << lines[i] << endl;
+        i++;
+    }
+    int rows = lines.size();
+    int cols = lines[0].size();
+    fin.close();
+    //End file read, ready to make arrays
+    BitArray2D *array;
+    array = new BitArray2D(rows,cols);
+
+    return array;
+
 }
 
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {

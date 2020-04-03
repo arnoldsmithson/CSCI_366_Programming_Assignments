@@ -18,7 +18,13 @@
 #include "BitArray2D.hpp"
 
 BitArray2D::BitArray2D(unsigned int rows, unsigned int columns) {
-
+    if(rows < 1 || columns < 1){
+        throw new BitArray2DException("Wrong size.");
+    }
+    else{
+        this->rows = rows;
+        this->columns = columns;
+    }
 }
 
 
@@ -28,6 +34,11 @@ BitArray2D::~BitArray2D() {
 
 
 bool BitArray2D::get(unsigned int row, unsigned int column){
+    if(row < 0 || row >= this->rows){
+        throw new BitArray2DException("Invalid row.");
+    } else if(column < 0 || column >= this->columns){
+        throw new BitArray2DException("Invalid column.");
+    }
    // set array bounds
 
    // get the element
@@ -37,6 +48,11 @@ bool BitArray2D::get(unsigned int row, unsigned int column){
 
 
 void BitArray2D::set(unsigned int row, unsigned int column){
+    if(row < 0 || row >= this->rows){
+        throw new BitArray2DException("Invalid row.");
+    } else if(column < 0 || column >= this->columns){
+        throw new BitArray2DException("Invalid column.");
+    }
    // check array bounds
 
    // set the element
