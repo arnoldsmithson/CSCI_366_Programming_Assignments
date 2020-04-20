@@ -31,17 +31,19 @@ int get_file_length(ifstream *file) {
 }
 
 void Server::initialize(unsigned int board_size,
-                        string p1_setup_board,
-                        string p2_setup_board) {
+                        string p1_setup_boar,
+                        string p2_setup_boar) {
     if (board_size != BOARD_SIZE) {
-        throw ServerException("Wrong Board Size");
-    } else if (p1_setup_board.length() < 1 || p2_setup_board.length() < 1) {
+        throw ServerException(" ");
+    } else if (p1_setup_boar.length() < 1 || p2_setup_boar.length() < 1) {
         throw ServerException("Bad File Names.");
-    }else if(p1_setup_board == p2_setup_board){
+    }else if(p1_setup_boar == p2_setup_boar){
         throw ServerException("Same Player File.");
     } else {
         this->board_size = board_size;
-        cout << "Working parameters" << endl;
+        p1_setup_board = scan_setup_board(p1_setup_boar);
+        p2_setup_board = scan_setup_board(p2_setup_boar);
+
         //Create the 2DBitArrays based on setup board using scan_setup_board
         // So, read in .txt and create the array in assembly.
     }
@@ -52,7 +54,7 @@ Server::~Server() {
 }
 
 
-BitArray2D *Server::scan_setup_board(string setup_board_name){//return BitArray2D to initialize arrays
+BitArray2D* Server::scan_setup_board(string setup_board_name){//return BitArray2D to initialize arrays
     //Section to read in file for initialization
     ifstream fin;
     fin.open(setup_board_name);
@@ -61,17 +63,26 @@ BitArray2D *Server::scan_setup_board(string setup_board_name){//return BitArray2
     int i = 0;
     while (getline(fin, line)) {
         lines[i] = line;
-        cout << lines[i] << endl;
         i++;
     }
     int rows = lines.size();
     int cols = lines[0].size();
-    fin.close();
+    cout << rows << endl;
+    cout << cols << endl;
     //End file read, ready to make arrays
-    BitArray2D *array;
-    array = new BitArray2D(rows,cols);
 
-    return array;
+        BitArray2D data(rows,cols);
+
+        for (int i = 0; i < rows; i++) {
+            for (int k = 0; k < cols; k++) {
+                if (lines[i].at(k) != '_') {
+                    cout << "Setting bit at "<< i << "," << k << endl;
+                   data.set(i,k);
+                }
+            }
+        }
+        BitArray2D *p = &data;
+        return p;
 
 }
 
@@ -83,27 +94,18 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
     } else if (player < 1 || player > MAX_PLAYERS) {
         throw ServerException("Bad Player Number.");
     } else {
+        bool present;
+        BitArray2D *pointer_board;
         if(player == 1){
-            player = 2;
+            pointer_board = p2_setup_board;
         }
         else{
-            player = 1;
+            pointer_board = p1_setup_board;
         }
-        string name = "player_" + to_string(player) + ".setup_board.txt";
-        ifstream fin;
-        fin.open(name);
-        string line;
-        vector<string> lines(board_size, "");
-        int i = 0;
-        while (getline(fin, line)) {
-            lines[i] = line;
-            cout << lines[i] << endl;
-            i++;
-        }
-        fin.close();
-        char spot = lines[x].at(y);
-        cout <<spot << " In board at " << x << ","<<y<<endl;
-        if (spot == 'B' || spot == 'D' || spot == 'R' || spot == 'S' || spot == 'C') {
+
+        present = pointer_board->get(x,y);
+
+        if (present) {
             return HIT;
         } else {
             return MISS;
@@ -130,13 +132,6 @@ int Server::process_shot(unsigned int player) {
                 fin(y,x);
                 if ((x < board_size && x >= 0) && (y < board_size && y >= 0)) {
                     result = evaluate_shot(player,x,y);
-                    /*if(player == 1){
-                        result = evaluate_shot(player+1, x, y);
-                    }
-                    else{
-                        result = evaluate_shot(player-1, x, y);
-                    }*/
-
                 } else {
                     cout << "OUT OF BOUNDS detected in process_shot" << endl;
                     result = OUT_OF_BOUNDS;

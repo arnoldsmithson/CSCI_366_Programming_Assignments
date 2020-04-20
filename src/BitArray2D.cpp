@@ -24,6 +24,7 @@ BitArray2D::BitArray2D(unsigned int rows, unsigned int columns) {
     else{
         this->rows = rows;
         this->columns = columns;
+        array = new char[(rows*columns/8) +3];
     }
 }
 
@@ -34,6 +35,7 @@ BitArray2D::~BitArray2D() {
 
 
 bool BitArray2D::get(unsigned int row, unsigned int column){
+
     if(row < 0 || row >= this->rows){
         throw new BitArray2DException("Invalid row.");
     } else if(column < 0 || column >= this->columns){

@@ -74,9 +74,6 @@ private:
     */
    char* array = nullptr;
 
-   unsigned int rows;
-   unsigned int columns;
-
 public:
    /**
     * Sets up the array to store rows * columns bits
@@ -104,6 +101,9 @@ public:
     * @param column
     */
    void set(unsigned int row, unsigned int column);
+
+    unsigned int rows;
+    unsigned int columns;
 };
 
 
